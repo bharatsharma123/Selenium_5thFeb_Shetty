@@ -2,6 +2,7 @@ package testcases;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -13,6 +14,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -27,18 +29,18 @@ import testComponents.BaseTest;
 
 public class SubmitOrderTest extends BaseTest{
 	
-	String productName = "ZARA COAT 3";
+	//String productNamee = "ZARA COAT 3";
 
-	@Test
-	public void submitOrder() throws IOException
+	@Test(dataProvider="getData")
+	public void submitOrder(HashMap<String,String> input) throws IOException
 	{
 		// TODO Auto-generated method stub
-		ProductCatalogue productCatalogue=landingPage.loginApplication("bharatsharma@gmail.com", "Admin@123");
-		productCatalogue.getProductByName(productName);
-		productCatalogue.addProductToCart(productName);
+		ProductCatalogue productCatalogue=landingPage.loginApplication(input.get("email"), input.get("password"));
+		productCatalogue.getProductByName(input.get("productName"));
+		productCatalogue.addProductToCart(input.get("productName"));
 		
 		CartPage cartPage=productCatalogue.goToCartPage();
-		Boolean match=cartPage.verifyProductDisplay(productName);
+		Boolean match=cartPage.verifyProductDisplay(input.get("productName"));
 		Assert.assertTrue(match);//anyMatch() retuns the boolean value
 		CheckoutPage checkoutPage=cartPage.goToCheckout();
 		checkoutPage.selectCountry("india");
@@ -53,12 +55,37 @@ public class SubmitOrderTest extends BaseTest{
 	}
 	
 	//To verify if "ZARA COAT 3" is displayed in the orders page
-			@Test(dependsOnMethods= {"submitTest"})
+			/*@Test(dependsOnMethods= {"submitTest"})
 			public void orderHistoryTest()
 			{
 				ProductCatalogue productCatalogue=landingPage.loginApplication("bharatsharma@gmail.com", "Admin@123");
 				OrderPage orderPage=productCatalogue.goToOrdersPage();
-				Assert.assertTrue(orderPage.verifyOrderDisplay(productName));
+				Assert.assertTrue(orderPage.verifyOrderDisplay(productNamee));
 			}
+			*/
+			
+			
+			/*@DataProvider
+			public Object[][] getData()
+			{
+				return new Object[][] {{"bharatsharma@gmail.com", "Admin@123","ZARA COAT 3"},{"anshika@gmail.com", "Iamking@000","ADIDAS ORIGINAL"}};
+			}*/
+	
+	@DataProvider
+	public Object[][] getData() throws IOException
+	{
+		HashMap<String,String>map=new HashMap<String,String>();
+		map.put("email", "bharatsharma@gmail.com");
+		map.put("password", "Admin@123");
+		map.put("productName", "ZARA COAT 3");
+		
+		HashMap<String,String>map1=new HashMap<String,String>();
+		map1.put("email", "anshika@gmail.com");
+		map1.put("password", "Iamking@000");
+		map1.put("productName", "ADIDAS ORIGINAL");
+		return new Object[][] {{map},{map1}};
+	
+	
+	}
 
 }
